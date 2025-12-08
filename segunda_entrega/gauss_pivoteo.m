@@ -10,6 +10,10 @@ function [x, er] = gauss_pivoteo(A, b, tol)
 % SALIDAS:
 %   x   : Vector de solución (n x 1).
 %   er  : Código de error (0 si no hay error, -1 si la matriz es singular).
+% VARIABLES INTERNAS:
+%   n   : Dimensión de la matriz A.
+%   s   : Vector de escala para el pivoteo parcial.
+% ========================================
 
     [n, m] = size(A);
     if n ~= m
@@ -44,6 +48,8 @@ end
 % -----------------------------------------------------------------
 function [A, b, s, er] = eliminar(A, s, n, b, tol)
     er = 0;
+
+    % El proceso de eliminación se realiza desde la columna 1 hasta la n-1
     for k = 1:(n - 1)
         % --- Pivotear ---
         [A, b, s] = pivotear(A, b, s, n, k);
@@ -85,6 +91,7 @@ function [A, b, s] = pivotear(A, b, s, n, k)
         end
     end
 
+    % Si la fila pivote óptima (p) no es la fila actual (k), se intercambian.
     if p ~= k
         % Intercambiar filas en A
         temp_row_A = A(p, :);
@@ -108,8 +115,11 @@ end
 % -----------------------------------------------------------------
 function x = sustituir(A, n, b)
     x = zeros(n, 1);
+
+    % 1. Calcular x(n) (la última componente)
     x(n) = b(n) / A(n, n);
 
+    % 2. Calcular x(n-1) hasta x(1)
     for i = (n - 1):-1:1
         sum = A(i, (i + 1):n) * x((i + 1):n);
         x(i) = (b(i) - sum) / A(i, i);
